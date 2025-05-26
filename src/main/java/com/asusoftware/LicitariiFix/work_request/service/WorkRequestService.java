@@ -1,5 +1,6 @@
 package com.asusoftware.LicitariiFix.work_request.service;
 
+import com.asusoftware.LicitariiFix.exception.UserNotFoundException;
 import com.asusoftware.LicitariiFix.user.model.User;
 import com.asusoftware.LicitariiFix.user.model.UserRole;
 import com.asusoftware.LicitariiFix.user.repository.UserRepository;
@@ -29,13 +30,14 @@ public class WorkRequestService {
     private final WorkImageRepository workImageRepository;
     private final ModelMapper mapper;
 
-    public WorkRequestDto create(UUID clientId, CreateWorkRequestDto dto, List<MultipartFile> files) {
+    public WorkRequestDto create(UUID keycloakId, CreateWorkRequestDto dto, List<MultipartFile> files) {
+        User client = userRepository.findByKeycloakId(keycloakId).orElseThrow(() -> new UserNotFoundException("Client not found"));
         WorkRequest entity = WorkRequest.builder()
                 .title(dto.getTitle())
                 .description(dto.getDescription())
                 .location(dto.getLocation())
                 .status(WorkRequestStatus.PENDING)
-                .clientId(clientId)
+                .clientId(client.getId())
                 .build();
         workRequestRepository.save(entity);
 
@@ -67,8 +69,9 @@ public class WorkRequestService {
                 }).collect(Collectors.toList());
     }
 
-    public List<WorkRequestDto> getByClient(UUID clientId) {
-        return workRequestRepository.findAllByClientId(clientId)
+    public List<WorkRequestDto> getByClient(UUID keycloakId) {
+        User client = userRepository.findByKeycloakId(keycloakId).orElseThrow(() -> new UserNotFoundException("Client not found"));
+        return workRequestRepository.findAllByClientId(client.getId())
                 .stream().map(w -> {
                     WorkRequestDto dto = mapper.map(w, WorkRequestDto.class);
                     dto.setPhotos(workImageRepository.findAllByWorkRequestId(w.getId())
@@ -77,9 +80,8 @@ public class WorkRequestService {
                 }).collect(Collectors.toList());
     }
 
-    public void approve(UUID workRequestId, UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public void approve(UUID workRequestId, UUID keycloakId) {
+        User user = userRepository.findByKeycloakId(keycloakId).orElseThrow(() -> new UserNotFoundException("Client not found"));
         if (user.getRole() != UserRole.ADMIN) {
             throw new RuntimeException("Doar un administrator poate aproba lucrări.");
         }
@@ -90,9 +92,8 @@ public class WorkRequestService {
         });
     }
 
-    public void reject(UUID workRequestId, UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public void reject(UUID workRequestId, UUID keycloakId) {
+        User user = userRepository.findByKeycloakId(keycloakId).orElseThrow(() -> new UserNotFoundException("Client not found"));
         if (user.getRole() != UserRole.ADMIN) {
             throw new RuntimeException("Doar un administrator poate respinge lucrări.");
         }
