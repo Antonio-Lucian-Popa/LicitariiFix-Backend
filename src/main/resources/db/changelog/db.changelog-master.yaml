@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: LICITARIIFIX/master.yaml
+      relativeToChangelogFile: true
