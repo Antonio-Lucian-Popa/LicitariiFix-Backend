@@ -4,11 +4,13 @@ import com.asusoftware.LicitariiFix.exception.UserNotFoundException;
 import com.asusoftware.LicitariiFix.notification.model.Notification;
 import com.asusoftware.LicitariiFix.notification.model.dto.CreateNotificationDto;
 import com.asusoftware.LicitariiFix.notification.model.dto.NotificationDto;
+import com.asusoftware.LicitariiFix.notification.model.dto.NotificationMessage;
 import com.asusoftware.LicitariiFix.notification.repository.NotificationRepository;
 import com.asusoftware.LicitariiFix.user.model.User;
 import com.asusoftware.LicitariiFix.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final ModelMapper mapper;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public void send(CreateNotificationDto dto) {
         Notification n = Notification.builder()
@@ -29,6 +32,12 @@ public class NotificationService {
                 .message(dto.getMessage())
                 .build();
         notificationRepository.save(n);
+
+        // Notificare în timp real
+        messagingTemplate.convertAndSend(
+                "/topic/notifications/" + dto.getUserId(),
+                new NotificationMessage(dto.getMessage())
+        );
     }
 
     public List<NotificationDto> getByUser(UUID keycloakId) {
