@@ -1,12 +1,15 @@
 package com.asusoftware.LicitariiFix.offer.service;
 
 import com.asusoftware.LicitariiFix.exception.UserNotFoundException;
+import com.asusoftware.LicitariiFix.notification.model.dto.CreateNotificationDto;
+import com.asusoftware.LicitariiFix.notification.service.NotificationService;
 import com.asusoftware.LicitariiFix.offer.model.Offer;
 import com.asusoftware.LicitariiFix.offer.model.dto.CreateOfferDto;
 import com.asusoftware.LicitariiFix.offer.model.dto.OfferDto;
 import com.asusoftware.LicitariiFix.offer.repository.OfferRepository;
 import com.asusoftware.LicitariiFix.user.model.User;
 import com.asusoftware.LicitariiFix.user.repository.UserRepository;
+import com.asusoftware.LicitariiFix.work_request.repository.WorkRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,8 @@ public class OfferService {
 
     private final OfferRepository offerRepository;
     private final UserRepository userRepository;
+    private final WorkRequestRepository workRequestRepository;
+    private final NotificationService notificationService;
     private final ModelMapper mapper;
 
     public OfferDto create(UUID keycloakId, CreateOfferDto dto) {
@@ -36,6 +41,14 @@ public class OfferService {
                 .workRequestId(dto.getWorkRequestId())
                 .build();
         offerRepository.save(entity);
+
+        // Notifică clientul că a primit o ofertă nouă
+        workRequestRepository.findById(dto.getWorkRequestId()).ifPresent(req -> {
+            notificationService.send(CreateNotificationDto.builder()
+                    .userId(req.getClientId())
+                    .message("Ai primit o ofertă nouă pentru lucrarea \"" + req.getTitle() + "\".")
+                    .build());
+        });
         return mapper.map(entity, OfferDto.class);
     }
 
