@@ -1,5 +1,8 @@
 package com.asusoftware.LicitariiFix.config;
 
+import com.asusoftware.LicitariiFix.exception.UserAlreadyExistsException;
+import com.asusoftware.LicitariiFix.user.model.dto.CreateUserDto;
+import com.asusoftware.LicitariiFix.user.model.dto.LoginDto;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;

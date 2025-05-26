@@ -2,6 +2,8 @@ package com.asusoftware.LicitariiFix.work_request.model.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -10,5 +12,5 @@ public class CreateWorkRequestDto {
     private String title;
     private String description;
     private String location;
-    private String[] photos;
+    private List<String> photos;
 }

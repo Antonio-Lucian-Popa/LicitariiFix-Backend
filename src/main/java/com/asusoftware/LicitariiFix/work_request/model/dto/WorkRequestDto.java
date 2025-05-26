@@ -4,6 +4,7 @@ import com.asusoftware.LicitariiFix.work_request.model.WorkRequestStatus;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -15,7 +16,7 @@ public class WorkRequestDto {
     private String title;
     private String description;
     private String location;
-    private String[] photos;
+    private List<String> photos;
     private WorkRequestStatus status;
     private UUID clientId;
     private Instant createdAt;

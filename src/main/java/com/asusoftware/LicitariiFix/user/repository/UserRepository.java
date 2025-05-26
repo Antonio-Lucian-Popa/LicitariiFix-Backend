@@ -13,4 +13,18 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByKeycloakId(String keycloakId);
 
     boolean existsByKeycloakId(String keycloakId);
+
+    /**
+     * Caută un utilizator după UUID-ul din Keycloak.
+     */
+    Optional<User> findByKeycloakId(UUID keycloakId);
+
+    /**
+     * Verifică dacă un user cu rolul dat este deja înregistrat cu un anumit Keycloak ID.
+     */
+    boolean existsByKeycloakIdAndRole(UUID keycloakId, String role);
+
+    Optional<User> findByEmail(String email);
+
+    boolean existsByEmail(String email);
 }

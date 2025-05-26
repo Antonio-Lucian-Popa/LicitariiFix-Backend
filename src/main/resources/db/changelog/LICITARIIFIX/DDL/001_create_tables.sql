@@ -25,6 +25,13 @@ CREATE TABLE work_requests (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE work_images (
+    id UUID PRIMARY KEY,
+    work_request_id UUID REFERENCES work_requests(id) ON DELETE CASCADE,
+    photo_url TEXT NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE offers (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     price DECIMAL(10, 2) NOT NULL,

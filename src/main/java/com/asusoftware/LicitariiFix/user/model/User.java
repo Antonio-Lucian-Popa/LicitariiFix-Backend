@@ -3,6 +3,8 @@ package com.asusoftware.LicitariiFix.user.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -34,5 +36,5 @@ public class User {
     private UserRole role;
 
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt = Instant.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

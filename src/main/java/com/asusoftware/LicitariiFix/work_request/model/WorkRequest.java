@@ -26,9 +26,6 @@ public class WorkRequest {
 
     private String location;
 
-    @Column(columnDefinition = "text[]")
-    private String[] photos;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private WorkRequestStatus status;
