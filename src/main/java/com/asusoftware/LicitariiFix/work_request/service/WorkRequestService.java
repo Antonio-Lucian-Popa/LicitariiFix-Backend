@@ -1,6 +1,8 @@
 package com.asusoftware.LicitariiFix.work_request.service;
 
 import com.asusoftware.LicitariiFix.exception.UserNotFoundException;
+import com.asusoftware.LicitariiFix.notification.model.dto.CreateNotificationDto;
+import com.asusoftware.LicitariiFix.notification.service.NotificationService;
 import com.asusoftware.LicitariiFix.user.model.User;
 import com.asusoftware.LicitariiFix.user.model.UserRole;
 import com.asusoftware.LicitariiFix.user.repository.UserRepository;
@@ -28,6 +30,7 @@ public class WorkRequestService {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
     private final WorkImageRepository workImageRepository;
+    private final NotificationService notificationService;
     private final ModelMapper mapper;
 
     public WorkRequestDto create(UUID keycloakId, CreateWorkRequestDto dto, List<MultipartFile> files) {
@@ -89,6 +92,11 @@ public class WorkRequestService {
         workRequestRepository.findById(workRequestId).ifPresent(req -> {
             req.setStatus(WorkRequestStatus.APPROVED);
             workRequestRepository.save(req);
+
+            notificationService.send(CreateNotificationDto.builder()
+                    .userId(req.getClientId())
+                    .message("Lucrarea ta \"" + req.getTitle() + "\" a fost aprobată.")
+                    .build());
         });
     }
 
@@ -101,6 +109,11 @@ public class WorkRequestService {
         workRequestRepository.findById(workRequestId).ifPresent(req -> {
             req.setStatus(WorkRequestStatus.REJECTED);
             workRequestRepository.save(req);
+
+            notificationService.send(CreateNotificationDto.builder()
+                    .userId(req.getClientId())
+                    .message("Lucrarea ta \"" + req.getTitle() + "\" a fost respinsă.")
+                    .build());
         });
     }
 }
